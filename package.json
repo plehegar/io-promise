@@ -1,0 +1,22 @@
+{
+  "name": "io-promise",
+  "version": "1.0.1",
+  "description": "I/O primitives using promises",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plehegar/io-promise.git"
+  },
+  "keywords": [
+    "fetch"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/plehegar/io-promise/issues"
+  },
+  "homepage": "https://github.com/plehegar/io-promise#readme"
+}
