@@ -11,10 +11,10 @@
 */
 
 // array for monitoring
-var fetches;
+let fetches;
 
 // array for caches
-var caches = [];
+let caches = [];
 
 // Definition of a response
 class Response {
@@ -34,9 +34,9 @@ class Response {
 
 any = function (params) {
   // console.log("Calling exports.any");
-  var settings = {};
-  var opts = (params.options === undefined)? {} : params.options;
-  var delay = 0;
+  let settings = {};
+  let opts = (params.options === undefined)? {} : params.options;
+  let delay = 0;
   if (opts.delay !== undefined) {
     delay = opts.delay * 1000; // use seconds instead of ms
   }
@@ -57,7 +57,7 @@ any = function (params) {
     if (settings.headers['Content-Type'] === undefined) {
       if (typeof params.data == "object") {
         settings.headers['Content-Type'] = "application/json";
-        var data = JSON.stringify(params.data);
+        let data = JSON.stringify(params.data);
         params.data = data;
       } else {
         settings.headers['Content-Type'] = "application/octet-stream";
@@ -70,25 +70,25 @@ any = function (params) {
       // @@support other primitive types?
     }
   }
-  var library = require((params.url.indexOf("https://") === 0)? "https" : "http");
+  let library = require((params.url.indexOf("https://") === 0)? "https" : "http");
   if (fetches !== undefined) { // if monitoring
     fetches.push(params.url);
   }
   return new Promise(function (resolve, reject) {
-    var location = require("url").parse(params.url);
+    let location = require("url").parse(params.url);
     settings.hostname = location.hostname;
     settings.path = location.path;
-    var req = library.request(settings, function(res) {
-      var buffer = "";
+    let req = library.request(settings, function(res) {
+      let buffer = "";
       res.on('data', function (chunk) {
         buffer += chunk;
       });
       res.on('end', function () {
-        var response = new Response({ status: res.statusCode,
+        let response = new Response({ status: res.statusCode,
                                  url: params.url,
                                  data: buffer,
                                  headers: res.headers });
-        var fct = reject;
+        let fct = reject;
         if (res.statusCode >= 200 && res.statusCode < 300) {
           fct =resolve;
         }
@@ -139,7 +139,7 @@ exports.fetch = exports.get;
 // File IO
 
 exports.read = function (filename, options) {
-  var opts = options;
+  let opts = options;
   if (options === undefined) {
     opts = {  encoding: "utf-8" };
   }
@@ -155,7 +155,7 @@ exports.read = function (filename, options) {
 };
 
 exports.save = function (filename, data, options) {
-  var opts = options;
+  let opts = options;
   if (options === undefined) {
     opts = { encoding: "utf-8" };
   }
@@ -204,7 +204,7 @@ exports.monitor = function () {
 exports.wait = function (delay, continuation) {
   return new Promise(function (resolve, reject) {
     setTimeout(function () {
-      var result;
+      let result;
       if (continuation !== undefined) {
         if (typeof continuation == "function") {
           try {
@@ -225,7 +225,7 @@ exports.wait = function (delay, continuation) {
 // caching
 
 exports.Cache = function (path) {
-  var cache; // keep the caches[path] object
+  let cache; // keep the caches[path] object
   if (path === undefined) {
     path = "/tmp/";
   }
@@ -251,8 +251,8 @@ exports.Cache = function (path) {
   }
   // creates a uniq hash for cache entry
   function getUniqId() {
-    var id = Math.random() * 10**10; // creates a hash
-    for (var key in cache) {
+    let id = Math.random() * 10**10; // creates a hash
+    for (let key in cache) {
       if (cache[key].data === id) {
         return getUniqId();
       }
@@ -271,13 +271,13 @@ exports.Cache = function (path) {
   // fetch a resource and add it into the cache
   function fetchNCache(url, options) {
     return exports.fetch(url, options).then(res => {
-      var copy = cache[url];
-      var id = getUniqId();
+      let copy = cache[url];
+      let id = getUniqId();
       if (copy !== undefined) {
         id = copy.data; // overwrite this entry
       }
-      var copy = cache[url];
-      var entry = { status : res.status, url : res.url, data : id, headers : res.headers };
+      let copy = cache[url];
+      let entry = { status : res.status, url : res.url, data : id, headers : res.headers };
       return exports.save(path + id + ".meta.json", entry).then(meta => {
         return exports.save(path + id + ".data", res.data).then(data => {
           return addEntry(url, entry).then(r => res);
@@ -287,10 +287,10 @@ exports.Cache = function (path) {
   }
   // load a resource, from the cache or add it there as well if needed
   this.load = function(url, options) {
-    var invalidate = false || (options !== undefined && options.invalidate);
+    let invalidate = false || (options !== undefined && options.invalidate);
     if (invalidate) console.log("invalidate");
     return loadCache().then(cache => {
-       var copy = cache[url];
+       let copy = cache[url];
        if (copy !== undefined) {
 //        if (copy !== undefined && !!invalidate) {
           return exports.read(path + copy.data + ".meta.json").then(meta => {
