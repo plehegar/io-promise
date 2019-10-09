@@ -27,6 +27,7 @@ class Response {
     this.url    = options.url;
     this.data   = options.data; // @@ should be a buffer
     this.headers = options.headers;
+    this.ok     = false;
   }
   text() {
     return Promise.resolve(this.data);
@@ -98,6 +99,7 @@ any = function (params) {
         let fct = reject;
         if (res.statusCode >= 200 && res.statusCode < 300) {
           fct =resolve;
+          response.ok = true;
         }
         if (delay === 0) {
           fct(response);
