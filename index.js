@@ -9,9 +9,13 @@
 
  [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
 */
+const https = require("https");
+const http  = require("http");
+const URL   = require("url");
+const FS    = require("fs");
 
 // array for monitoring
-let fetches;
+let MONITORING;
 
 // array for caches
 let caches = [];
@@ -48,6 +52,9 @@ any = function (params) {
     return new Promise(function (resolve, reject) {
       reject(params.verb + " url is undefined");
     });
+  } else {
+    // ensure url is a string
+    params.url = "" + params.url;
   }
   if (opts.headers !== undefined) {
     settings.headers = JSON.parse(JSON.stringify(params.options.headers));
@@ -70,12 +77,12 @@ any = function (params) {
       // @@support other primitive types?
     }
   }
-  let library = require((params.url.indexOf("https://") === 0)? "https" : "http");
-  if (fetches !== undefined) { // if monitoring
-    fetches.push(params.url);
+  let library = (params.url.indexOf("https://") === 0)? https : http;
+  if (MONITORING !== undefined) { // if monitoring
+    MONITORING.push(params.url);
   }
   return new Promise(function (resolve, reject) {
-    let location = require("url").parse(params.url);
+    let location = URL.parse(params.url);
     settings.hostname = location.hostname;
     settings.path = location.path;
     let req = library.request(settings, function(res) {
@@ -144,7 +151,7 @@ exports.read = function (filename, options) {
     opts = {  encoding: "utf-8" };
   }
   return new Promise(function (resolve, reject) {
-    require('fs').readFile(filename, opts, function(err, data) {
+    FS.readFile(filename, opts, function(err, data) {
       if (err) {
         reject (err);
       } else {
@@ -166,7 +173,7 @@ exports.save = function (filename, data, options) {
     bytes = data;
   }
   return new Promise(function (resolve, reject) {
-    require('fs').writeFile(filename, bytes, opts, function(err) {
+    FS.writeFile(filename, bytes, opts, function(err) {
       if (err) {
         reject (err);
       } else {
@@ -184,19 +191,19 @@ exports.readJSON = function (filename) {
 
 exports.fetches = function() {
   // makes a copy
-  if (fetches !== undefined) {
-    return fetches.map(function (u) {
+  if (MONITORING !== undefined) {
+    return MONITORING.map(function (u) {
       return u;
     });
   }
 };
 
 exports.fetchesCount = function() {
-  return (fetches === undefined)? 0 : fetches.length;
+  return (MONITORING === undefined)? 0 : MONITORING.length;
 };
 
 exports.monitor = function () {
-  fetches = [];
+  MONITORING = [];
 };
 
 // delay a promise
