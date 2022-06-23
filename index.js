@@ -285,7 +285,6 @@ exports.Cache = function (path) {
       if (copy !== undefined) {
         id = copy.data; // overwrite this entry
       }
-      let copy = cache[url];
       let entry = { status : res.status, url : res.url, data : id, headers : res.headers };
       return exports.save(path + id + ".meta.json", entry).then(meta => {
         return exports.save(path + id + ".data", res.data).then(data => {
